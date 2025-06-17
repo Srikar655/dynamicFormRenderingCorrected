@@ -1,0 +1,21 @@
+<div class="app-container">
+  <header class="app-header">
+    <div class="header-content">
+      <h1>{{ title }}</h1>
+      <p>FR9 Stage 1 Shroud Dimensional Inspection System</p>
+    </div>
+    <nav class="app-navigation">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">New Form</a>
+      <a routerLink="/submissions" routerLinkActive="active">Submissions</a>
+    </nav>
+  </header>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="app-footer">
+    <p>&copy; 2024 BHEL Dynamic Forms System. All rights reserved.</p>
+  </footer>
+</div>
+

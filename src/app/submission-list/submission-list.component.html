@@ -1,0 +1,46 @@
+<!-- Submission List Container -->
+<div class="submission-list-container">
+  <div class="list-header">
+    <h2>Inspection Submissions</h2>
+    <div class="header-actions">
+      <button class="btn btn-primary" (click)="refreshList()">
+        <span class="icon">🔄</span> Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading submissions...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-state">
+    <span class="error-icon">⚠️</span>
+    <p>{{ error }}</p>
+    <button class="btn btn-secondary" (click)="refreshList()">Try Again</button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && reports.length === 0" class="empty-state">
+    <span class="empty-icon">📝</span>
+    <p>No submissions found</p>
+  </div>
+
+  <!-- Submissions List -->
+  <div *ngIf="!loading && !error && reports.length > 0" class="submissions-list">
+    <div *ngFor="let report of reports" class="submission-item">
+      <div class="job-number">{{ report.data.jobNumber }}</div>
+      <div class="job-number">{{ report.data.customer }}</div>
+      <div class="item-actions">
+        <button class="btn btn-edit" (click)="editSubmission(report)">
+          <span class="icon">✏️</span> Edit
+        </button>
+        <button class="btn btn-delete" (click)="deleteSubmission(report)">
+          <span class="icon">🗑️</span> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

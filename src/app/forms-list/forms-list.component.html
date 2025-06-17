@@ -1,0 +1,46 @@
+<!-- Forms List Container -->
+<div class="forms-list-container">
+  <div class="list-header">
+    <h2>Available Forms</h2>
+    <div class="header-actions">
+      <button class="btn btn-primary" (click)="refreshList()">
+        <span class="icon">🔄</span> Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading forms...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-state">
+    <span class="error-icon">⚠️</span>
+    <p>{{ error }}</p>
+    <button class="btn btn-secondary" (click)="refreshList()">Try Again</button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && (!forms || forms.length === 0)" class="empty-state">
+    <span class="empty-icon">📝</span>
+    <p>No forms available</p>
+  </div>
+
+  <!-- Forms List -->
+  <div *ngIf="!loading && !error && forms && forms.length > 0" class="forms-list">
+    <div *ngFor="let form of forms" class="form-item" (click)="onSelect(form)">
+      <div class="form-info">
+        <div class="form-title">{{ form.title }}</div>
+        <div class="form-meta">
+          <span class="form-id">ID: {{ form.formId }}</span>
+          <span class="form-version">Version: {{ form.revision }}</span>
+        </div>
+      </div>
+      <div class="form-arrow">
+        <span class="icon">→</span>
+      </div>
+    </div>
+  </div>
+</div>
