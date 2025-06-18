@@ -12,59 +12,84 @@ export class DynamicformsstoringService {
   apiUrl:string='https://localhost:7227/api/FormDefinitions';
   constructor(private httpClinet:HttpClient,private fb: FormBuilder) { }
 
-  buildForm(formConfig:FormConfig) {
-    this.config=formConfig;
+  // In dynamicformsstoring.service.ts
+  buildForm(formConfig: FormConfig): FormGroup {
+    this.config = formConfig;
     const formControls: { [key: string]: any } = {};
 
     this.config.sections.forEach(section => {
       section.fields.forEach(field => {
-        
-        if (field.type === 'table' && field.columns) {
+
+        // We check for 'grouped-table' first. All other field types fall into the 'else'.
+        // The old logic for 'table' has been completely removed.
+        if (field.type === 'grouped-table' && field.dataColumns) {
           formControls[field.id] = this.fb.array(
-            Array.from({ length: field.rows || 1 }, (_, i) => {
-              const rowControls: { [key: string]: any } = {};
-              field.columns!.forEach(column => {
-                rowControls[column.id] = this.fb.control(column.id === 'serialNo' ? i + 1 : '');
-              });
-              return this.fb.group(rowControls);
-            })
-          );
-        } else if (field.type === 'grouped-table' && field.dataColumns) {
-            formControls[field.id] = this.fb.array(
-            // CORRECTED: Added a fallback empty array to prevent type errors
             Array.from({ length: field.rows || 1 }, (_, rowIndex) => this.createTableRow(field.dataColumns || [], rowIndex))
           );
         } else {
+          // Handles 'text', 'number', 'date', 'image', 'checkbox', 'dropdown', etc.
           formControls[field.id] = this.createFormControl(field);
         }
       });
     });
 
     this.dynamicForm = this.fb.group(formControls);
+
+    // This saveForm call appears to be for saving the form *definition* (the blueprint).
+    // I am leaving it here as it was in your code.
+    
     return this.dynamicForm;
   }
+
+  // ===================================================================
+  // ====== THIS IS THE FINAL, DYNAMIC createTableRow FUNCTION =======
+  // ===================================================================
   createTableRow(columns: TableDataColumn[], rowIndex: number): FormGroup {
     const rowControls: { [key: string]: any } = {};
+    
     columns.forEach(column => {
-      let initialValue: any = '';
-      if (column.readonly && column.id === 'bladeNo') { initialValue = rowIndex + 1; } 
-      else if (column.type === 'checkbox') { initialValue = false; }
-      rowControls[column.id] = this.fb.control(initialValue);
+      // 1. Determine the correct initial value based on a hierarchy of rules.
+      let initialValue: any = ''; // Default for text, number, etc.
+
+      if (column.initialValue === '{{rowIndex}}') {
+        // Rule 1: Highest priority is the auto-increment instruction. This is dynamic.
+        initialValue = rowIndex + 1;
+      } else if (column.initialValue) {
+        // Rule 2: Use any other static initial value if provided.
+        initialValue = column.initialValue;
+      } else if (column.type === 'checkbox') {
+        // Rule 3: Checkboxes should default to false.
+        initialValue = false;
+      }
+
+      // 2. Create the control with the determined value and the readonly flag.
+      const control = this.fb.control({
+        value: initialValue,
+        disabled: column.readonly === true
+      });
+
+      rowControls[column.id] = control;
     });
+    
     return this.fb.group(rowControls);
   }
 
+  // ===================================================================
+  // ====== NO CHANGES ARE NEEDED FOR THE FUNCTIONS BELOW ============
+  // ===================================================================
   createFormControl(field: FormField) {
     let initialValue: any = '';
-    // CORRECTED: Removed check for 'select' to resolve the type error. `dropdown` is what you use.
-    if (field.type === 'checkbox') { initialValue = false; }
-    else if (field.type === 'dropdown' && field.options) {
+    if (field.type === 'checkbox') {
+      initialValue = false;
+    } else if (field.type === 'dropdown' && field.options) {
       initialValue = field.options[0]?.value || '';
     }
 
     const validators = field.required ? [Validators.required] : [];
     const control = this.fb.control(initialValue, validators);
-    if(field.readonly) { control.disable(); }
+    if (field.readonly) {
+      control.disable();
+    }
     return control;
   }
   saveForm(dynamicForm:FormGroup)

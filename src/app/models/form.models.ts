@@ -15,6 +15,7 @@ export interface TableDataColumn {
   step?: string;
   options?: { value: string; label: string }[];
   className?: string;
+  initialValue?: any; // <<< ADD THIS LINE
 }
 
 export interface TableColumn {
@@ -25,6 +26,7 @@ export interface TableColumn {
   placeholder?: string;
   step?: string;
   options?: { value: string; label: string }[];
+  initialValue?: any; // <<< ADD THIS LINE
 }
 
 export interface GroupedTableField {
@@ -33,17 +35,17 @@ export interface GroupedTableField {
   dataColumns?: TableDataColumn[];
 }
 
+// --- NO OTHER CHANGES ARE NEEDED BELOW THIS LINE ---
+
 // *** THIS IS THE MAIN DYNAMIC INTERFACE ***
 export interface FormField extends GroupedTableField {
   id: string;
   label: string;
-  // All allowed field types for ANY field in the form
   type: 'text' | 'number' | 'date' | 'radio' | 'table' | 'image' | 'grouped-table' | 'checkbox' | 'dropdown';
   required?: boolean;
   placeholder?: string;
   step?: string;
   readonly?: boolean;
-  // Options for dropdowns and radio buttons
   options?: { value: string; label: string }[];
   columns?: TableColumn[];
   imagePath?: string;
@@ -53,7 +55,6 @@ export interface FormField extends GroupedTableField {
   validationRules?: ValidationRules;
 }
 
-// --- No changes needed for the rest of your interfaces ---
 export interface ValidationRules {
   [key: string]: { min?: number; max?: number; };
 }
