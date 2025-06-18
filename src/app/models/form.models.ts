@@ -9,13 +9,13 @@ export interface HeaderCell {
 
 export interface TableDataColumn {
   id: string;
-  type: 'text' | 'number' | 'checkbox' | 'dropdown' |'radio';
+  type: 'text' | 'number' | 'checkbox' | 'dropdown' | 'radio';
   readonly?: boolean;
   placeholder?: string;
   step?: string;
-  options?: { value: string; label: string }[];
+  options?: { value: string; label:string }[];
   className?: string;
-  initialValue?: any; // <<< ADD THIS LINE
+  initialValue?: any;
 }
 
 export interface TableColumn {
@@ -26,7 +26,7 @@ export interface TableColumn {
   placeholder?: string;
   step?: string;
   options?: { value: string; label: string }[];
-  initialValue?: any; // <<< ADD THIS LINE
+  initialValue?: any;
 }
 
 export interface GroupedTableField {
@@ -35,13 +35,11 @@ export interface GroupedTableField {
   dataColumns?: TableDataColumn[];
 }
 
-// --- NO OTHER CHANGES ARE NEEDED BELOW THIS LINE ---
-
-// *** THIS IS THE MAIN DYNAMIC INTERFACE ***
 export interface FormField extends GroupedTableField {
   id: string;
   label: string;
-  type: 'text' | 'number' | 'date' | 'radio' | 'table' | 'image' | 'grouped-table' | 'checkbox' | 'dropdown';
+  // NOTE: 'table' type removed as it's no longer needed.
+  type: 'text' | 'number' | 'date' | 'radio' | 'image' | 'grouped-table' | 'checkbox' | 'dropdown';
   required?: boolean;
   placeholder?: string;
   step?: string;
@@ -53,24 +51,38 @@ export interface FormField extends GroupedTableField {
   imageWidth?: string;
   imageHeight?: string;
   validationRules?: ValidationRules;
+  // ADD THIS NEW PROPERTY
+  layout?: {
+    gridColumn?: string;
+    gridRow?: string;
+  };
 }
 
 export interface ValidationRules {
-  [key: string]: { min?: number; max?: number; };
+  [key: string]: any;
 }
+
 export interface FormSection {
   title: string;
   description?: string;
   fields: FormField[];
+  // ADD THIS NEW PROPERTY
+  layout?: {
+    gridTemplateColumns?: string;
+    gap?: string;
+  };
 }
+
 export interface BusinessRules {
   tolerances: { [key: string]: { min: number; max: number; nominal: number; }; };
   decisionCriteria: { repair: DecisionCriteria; replace: DecisionCriteria; reject: DecisionCriteria; };
 }
+
 export interface DecisionCriteria {
   description: string;
   conditions: string[];
 }
+
 export interface FormConfig {
   title: string;
   formId: string;
@@ -78,9 +90,11 @@ export interface FormConfig {
   sections: FormSection[];
   businessRules?: BusinessRules;
 }
+
 export interface FormData {
   [key: string]: any;
 }
+
 export interface InspectionResult {
   decision: 'repair' | 'replace' | 'reject';
   confidence: number;
